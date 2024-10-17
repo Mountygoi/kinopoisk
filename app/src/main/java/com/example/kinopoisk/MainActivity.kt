@@ -32,9 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
-import com.example.kinopoisk.ui.theme.BottomNavigationBar
-import com.example.kinopoisk.ui.theme.SetupNavigation
+
 
 
 data class Data2(val title: String, val image: Int)
@@ -115,7 +113,7 @@ fun MyLazyRow(title: String, movies: List<Data2>) {
                     verticalArrangement = Arrangement.Center
                 ){
                     Image(
-                        painter = painterResource(id = R.drawable.newphoto),
+                        painter = painterResource(id = R.drawable.newphotoo),
                         contentDescription = null,
                         modifier = Modifier.size(120.dp)
                             .padding(15.dp)
