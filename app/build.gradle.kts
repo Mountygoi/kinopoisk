@@ -68,15 +68,12 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-<<<<<<< HEAD
     debugImplementation ("androidx.compose.ui:ui-tooling:1.7.3")
     debugImplementation ("androidx.compose.ui:ui-test-manifest:1.7.3")
-=======
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     implementation("androidx.navigation:navigation-compose:2.8.2")
-    implementation("androidx.navigation:navigation-compose:2.8.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.5")
->>>>>>> 6e3887df1ab43f57e0d7d85ed570eaddccad002c
+    implementation("androidx.navigation:navigation-compose:2.8.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
 }
