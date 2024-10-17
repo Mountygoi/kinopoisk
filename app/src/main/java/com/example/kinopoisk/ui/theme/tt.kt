@@ -86,17 +86,17 @@ sealed class NavigationItem(val route: String, val icon: ImageVector, val title 
                 Text(text = "Profile Screen")
             }
         }
-        @Composable
-                fun MainScreen(){
-                    val navController = rememberNavController()
-            Scaffold(
-                bottomBar = { BottomNavigationBar(navController)
-                }
-            )
-            { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    SetupNavigation(navController = navController)
-                }
-            }
-                }
+//        @Composable
+//                fun MainScreen(){
+//                    val navController = rememberNavController()
+//            Scaffold(
+//                bottomBar = { BottomNavigationBar(navController)
+//                }
+//            )
+//            { innerPadding ->
+//                Box(modifier = Modifier.padding(innerPadding)) {
+//                    SetupNavigation(navController = navController)
+//                }
+//            }
+//                }
 
