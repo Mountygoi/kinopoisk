@@ -103,7 +103,6 @@ fun Dots(total: Int, selected: Int ,modifier: Modifier=Modifier) {
                     color = if (index == selected) Color.Black else Color.Gray,
                     shape = CircleShape
                 )
-                .then(if (index == selected) Modifier.size(12.dp) else Modifier)
             )
         }
     }

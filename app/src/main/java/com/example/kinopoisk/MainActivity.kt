@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.kinopoisk.navigation.NavigationToHomePage
 import com.example.kinopoisk.ui.theme.KinopoiskTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,8 +23,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
-                }
+NavigationToHomePage()                }
             }
         }
     }
@@ -41,6 +41,5 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     KinopoiskTheme {
-        Greeting("Android")
-    }
+NavigationToHomePage()    }
 }
