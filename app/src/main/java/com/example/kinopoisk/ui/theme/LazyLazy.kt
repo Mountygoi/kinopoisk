@@ -55,14 +55,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
-class LazyLazy: ComponentActivity(){
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            MainPage()
-        }
-    }
-}
+
 
 data class Data2(val title: String, val image: Int, )
 
@@ -101,6 +94,14 @@ fun MovieCard(item: Data2){
         Text(
             text = item.title,
             fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+            modifier = Modifier.padding(horizontal = 5.dp)
+                .align(Alignment.Start)
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+        Text(
+            text = "Драма",
+            fontSize = 12.sp,
             fontWeight = FontWeight.Normal,
             modifier = Modifier.padding(horizontal = 5.dp)
                 .align(Alignment.Start)
