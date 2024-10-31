@@ -1,6 +1,8 @@
 package com.example.kinopoisk.data
 
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query
@@ -18,3 +20,10 @@ interface KinoPoiskApi {
         @Header("X-API-KEY") apiKey: String = "a853907e-c925-4872-8e46-55f7fa62f09a"
     ): Response<MovieResponse>
 }
+val retrofit = Retrofit.Builder()
+    .baseUrl("https://kinopoiskapiunofficial.tech/")
+    .addConverterFactory(GsonConverterFactory.create())
+    .build()
+
+
+val apiService = retrofit.create(KinoPoiskApi::class.java)

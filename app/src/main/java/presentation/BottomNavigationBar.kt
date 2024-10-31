@@ -1,6 +1,7 @@
 package presentation
 
 
+import MoviesScreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -70,9 +71,14 @@ fun SetupNavigation(navController: NavHostController) {
         composable(NavigationItem.Profile.route) {
             ProfileScreen()
         }
-        composable("movieDetails/{filmTitle}") { backStackEntry ->
+        composable("details/{category}") { backStackEntry ->
+            val category = backStackEntry.arguments?.getString("category")
+            if (category != null) {
+                MoviesScreen(apiService, category)
+            }
+        }
+            composable("movieDetails/{filmTitle}") { backStackEntry ->
             val filmTitle = backStackEntry.arguments?.getString("filmTitle")
-            // Pass the film title and the Data2 object as item
             MovieDetailsScreen(filmTitle = filmTitle, item = viewM.premiers.value[0])
         }
     }
