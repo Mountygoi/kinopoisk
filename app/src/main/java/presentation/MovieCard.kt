@@ -127,7 +127,7 @@ fun MyLazyRow(title: String, movies: List<Data2>, navController:NavHostControlle
                 ) {
                     IconButton(
                         onClick = {
-                            navController.navigate("details") // Navigate to details on click
+                            navController.navigate("details/$category")
                         },
                         modifier = Modifier
                             .size(48.dp)
@@ -149,7 +149,7 @@ fun MyLazyRow(title: String, movies: List<Data2>, navController:NavHostControlle
                         fontWeight = FontWeight.Normal,
                         color = Color.Black,
                         modifier = Modifier.clickable {
-                            navController.navigate("details")
+                            navController.navigate("details$category")
                         }
                     )
                 }
