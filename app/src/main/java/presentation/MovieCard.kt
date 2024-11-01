@@ -1,5 +1,7 @@
 package presentation
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -111,6 +118,41 @@ fun MyLazyRow(title: String, movies: List<Data2>, navController:NavHostControlle
         ) {
             items(movies.take(8)) { movie ->
                 MovieCard(movie, navController)
+            }
+            item {
+                Column(
+                    modifier = Modifier,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    IconButton(
+                        onClick = {
+                            navController.navigate("details") // Navigate to details on click
+                        },
+                        modifier = Modifier
+                            .size(48.dp)
+                            .border(
+                                BorderStroke(1.dp, Color.White),
+                                shape = CircleShape
+                            )
+
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = "Next",
+                            tint = Color(0xFF3D3BFF)
+                        )
+                    }
+                    Text(
+                        text = "Показать все",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.Black,
+                        modifier = Modifier.clickable {
+                            navController.navigate("details")
+                        }
+                    )
+                }
             }
         }
     }
