@@ -1,14 +1,10 @@
-package presentation
+package com.example.kinopoisk.navigation
 
 
 import MoviesScreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -19,16 +15,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.kinopoisk.data.NavigationItem
 import com.example.kinopoisk.data.apiService
+import domain.FilmDetailsViewModel
+import domain.FilmDetailsViewModelFactory
 import domain.MoviesViewM
+import presentation.FilmScreen
+import presentation.MainPage
 
 
 @Composable
@@ -77,9 +79,14 @@ fun SetupNavigation(navController: NavHostController) {
                 MoviesScreen(apiService, category)
             }
         }
-            composable("movieDetails/{filmTitle}") { backStackEntry ->
-            val filmTitle = backStackEntry.arguments?.getString("filmTitle")
-            MovieDetailsScreen(filmTitle = filmTitle, item = viewM.premiers.value[0])
+        composable(route = "movieDetails/{kinopoiskId}", arguments = listOf(navArgument("kinopoiskId") { type = NavType.IntType })) { backStackEntry ->
+            val kinopoiskId = backStackEntry.arguments?.getInt("kinopoiskId")
+            if (kinopoiskId != null) {
+                val viewModel = viewModel<FilmDetailsViewModel>(factory = FilmDetailsViewModelFactory(apiService))
+                FilmScreen(viewModel = viewModel, filmId = kinopoiskId, navController = navController)
+            } else {
+                Text("Invalid Film ID")
+            }
         }
     }
 }
