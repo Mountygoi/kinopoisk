@@ -26,12 +26,16 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.kinopoisk.data.NavigationItem
 import com.example.kinopoisk.data.apiService
+import domain.ActorFilmographyViewModel
+import domain.ActorFilmographyViewModelFactory
 import domain.ActorViewModel
 import domain.FilmDetailsViewModel
 import domain.FilmDetailsViewModelFactory
 import domain.MoviesViewM
+import presentation.ActorFilmographyPage
 import presentation.ActorPagee
 import presentation.FilmScreen
+import presentation.GalleryDetailScreen
 import presentation.MainPage
 
 
@@ -98,6 +102,22 @@ fun SetupNavigation(navController: NavHostController) {
             val viewModel = remember { ActorViewModel(apiService) }
             ActorPagee(viewModel = viewModel, actorId = actorId, navController = navController)
         }
+        composable(route = "gallery/{filmId}", arguments = listOf(navArgument("filmId") { type = NavType.IntType })) { backStackEntry ->
+            val filmId = backStackEntry.arguments?.getInt("filmId")
+            if (filmId != null) {
+                GalleryDetailScreen(filmId = filmId)
+            }
+        }
+        composable(
+            route = "actorFilmography/{actorId}", arguments = listOf(navArgument("actorId") { type = NavType.IntType })) { backStackEntry ->
+            val actorId = backStackEntry.arguments?.getInt("actorId") ?: return@composable
+            val viewModelFactory = ActorFilmographyViewModelFactory(apiService)
+            val viewModel: ActorFilmographyViewModel = viewModel(factory = viewModelFactory)
+            ActorFilmographyPage(actorId = actorId, viewModel = viewModel, navController = navController
+            )
+        }
+
+
     }
 }
 
