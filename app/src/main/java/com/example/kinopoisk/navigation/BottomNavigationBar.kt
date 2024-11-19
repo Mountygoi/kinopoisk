@@ -26,9 +26,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.kinopoisk.data.NavigationItem
 import com.example.kinopoisk.data.apiService
+import domain.ActorViewModel
 import domain.FilmDetailsViewModel
 import domain.FilmDetailsViewModelFactory
 import domain.MoviesViewM
+import presentation.ActorPagee
 import presentation.FilmScreen
 import presentation.MainPage
 
@@ -87,6 +89,14 @@ fun SetupNavigation(navController: NavHostController) {
             } else {
                 Text("Invalid Film ID")
             }
+        }
+        composable(
+            route = "actorDetails/{actorId}",
+            arguments = listOf(navArgument("actorId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val actorId = backStackEntry.arguments?.getInt("actorId") ?: 0
+            val viewModel = remember { ActorViewModel(apiService) }
+            ActorPagee(viewModel = viewModel, actorId = actorId, navController = navController)
         }
     }
 }

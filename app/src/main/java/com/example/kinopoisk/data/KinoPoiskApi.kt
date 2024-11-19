@@ -18,7 +18,7 @@ interface KinoPoiskApi {
         @Query("yearFrom") yearFrom: Int = 1900,
         @Query("yearTo") yearTo: Int = 2100,
         @Query("page") page: Int = 1,
-        @Header("X-API-KEY") apiKey: String = "a853907e-c925-4872-8e46-55f7fa62f09a"
+        @Header("X-API-KEY") apiKey: String = "310642af-0077-49b4-b6e3-a21974d8f028"
     ): Response<MovieResponse>
 
     @GET("api/v2.2/films/{id}")
@@ -45,6 +45,11 @@ interface KinoPoiskApi {
         @Header("X-API-KEY") apiKey: String = "3cbd176e-b918-4b06-bad3-2bca1ae24f75"
     ):Response<SimilarResponse>
 
+    @GET("api/v1/staff/{id}")
+    suspend fun getActorDetailById(
+        @Path("id") id: Int,
+        @Header("X-API-KEY") apiKey: String = "310642af-0077-49b4-b6e3-a21974d8f028"
+    ): Response<ActorResponse>
 
     @GET("api/v2.2/films/{id}/images")
     suspend fun getFilmImages(
@@ -52,6 +57,7 @@ interface KinoPoiskApi {
         @Header("X-API-KEY") apiKey: String = "3cbd176e-b918-4b06-bad3-2bca1ae24f75"
     ): Response<FilmImagesResponse>
 }
+
 val retrofit = Retrofit.Builder()
     .baseUrl("https://kinopoiskapiunofficial.tech/")
     .addConverterFactory(GsonConverterFactory.create())
