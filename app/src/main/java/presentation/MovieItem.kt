@@ -9,7 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.kinopoisk.ui.theme.Data2
+import coil.compose.SubcomposeAsyncImage
+import com.example.kinopoisk.data.Data2
 
 
 @Composable

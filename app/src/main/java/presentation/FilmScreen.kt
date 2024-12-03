@@ -26,6 +26,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
@@ -38,19 +40,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.kinopoisk.R
+import com.example.kinopoisk.data.Data2
 import com.example.kinopoisk.data.FilmResponse
 import com.example.kinopoisk.data.ImageResponse
+import com.example.kinopoisk.data.NavigationItem
 import com.example.kinopoisk.data.SimilarFilmsResponse
 import com.example.kinopoisk.data.StaffResponse
 import domain.FilmDetailsIntent
 import domain.FilmDetailsState
 import domain.FilmDetailsViewModel
+import domain.SharedViewModel
 
 fun formatDuration(durationInMinutes: Int?): String {
     val hours = durationInMinutes?.div(60) ?: 0
@@ -58,21 +66,25 @@ fun formatDuration(durationInMinutes: Int?): String {
     return "$hours ч $minutes мин"
 }
 
-
 @Composable
-fun FilmScreen(viewModel: FilmDetailsViewModel, filmId: Int, navController: NavController) {
-    val state by viewModel.state.collectAsState()
+fun FilmScreen(
+    filmDetailsViewModel: FilmDetailsViewModel,
+    filmId: Int,
+    navController: NavController,
+    sharedViewModel: SharedViewModel,
+) {
+    val state by filmDetailsViewModel.state.collectAsState()
     LaunchedEffect(filmId) {
-        viewModel.handleIntent(FilmDetailsIntent.LoadMovieDetails(filmId))
+        filmDetailsViewModel.handleIntent(FilmDetailsIntent.LoadMovieDetails(filmId))
     }
+
     when (val currentState = state) {
         is FilmDetailsState.Loading -> LoadingView()
         is FilmDetailsState.Error -> {
             ErrorView(currentState.message) {
-                viewModel.handleIntent(FilmDetailsIntent.Retry)
+                filmDetailsViewModel.handleIntent(FilmDetailsIntent.Retry)
             }
         }
-
         is FilmDetailsState.Success -> {
             FilmDetails(
                 film = currentState.film,
@@ -80,9 +92,53 @@ fun FilmScreen(viewModel: FilmDetailsViewModel, filmId: Int, navController: NavC
                 staff = currentState.staff,
                 images = currentState.images,
                 similarFilms = currentState.similarFilms,
-                navController = navController
+                navController = navController,
+                sharedViewModel = sharedViewModel,
+
+                onLikeClicked = { movie ->
+                    toggleMovieInList(
+                        movie,
+                        sharedViewModel.likedMovies.value,
+                        sharedViewModel::setLikedMovies
+                    )
+                },
+                onSaveClicked = { movie ->
+                    toggleMovieInList(
+                        movie,
+                        sharedViewModel.savedMovies.value,
+                        sharedViewModel::setSavedMovies
+                    )
+                },
+                onWatchClicked = { movie ->
+                    toggleMovieInList(
+                        movie,
+                        sharedViewModel.watchedMovies.value,
+                        sharedViewModel::setWatchedMovies
+                    )
+                },
+                onOpenedClicked = { movie ->
+                    toggleMovieInList(
+                        movie,
+                        sharedViewModel.openedMovies.value,
+                        sharedViewModel::setOpenedMovies
+                    )
+                }
             )
         }
+
+        else -> {}
+    }
+}
+
+fun toggleMovieInList(
+    movie: Data2,
+    currentList: List<Data2>,
+    updateList: (List<Data2>) -> Unit
+) {
+    if (currentList.contains(movie)) {
+        updateList(currentList - movie)
+    } else {
+        updateList(currentList + movie)
     }
 }
 
@@ -91,11 +147,10 @@ fun LoadingView() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
-    ) {
+    ){
         CircularProgressIndicator()
     }
 }
-
 @Composable
 fun ErrorView(message: String, onRetry: () -> Unit) {
     Column {
@@ -105,7 +160,6 @@ fun ErrorView(message: String, onRetry: () -> Unit) {
         }
     }
 }
-
 @Composable
 fun FilmDetails(
     film: FilmResponse,
@@ -113,18 +167,37 @@ fun FilmDetails(
     staff: List<StaffResponse>?,
     images: List<ImageResponse>,
     similarFilms: List<SimilarFilmsResponse>,
-    navController: NavController
-) {
-    val scrollState = rememberScrollState()
+    navController: NavController,
+    sharedViewModel: SharedViewModel,
+    onLikeClicked: (Data2) -> Unit,
+    onSaveClicked: (Data2) -> Unit,
+    onWatchClicked: (Data2) -> Unit,
+    onOpenedClicked: (Data2) -> Unit,
+)
+ {
+     val isLiked by sharedViewModel.likedMovies.collectAsState()
+     val isSaved by sharedViewModel.savedMovies.collectAsState()
+     val isWatched by sharedViewModel.watchedMovies.collectAsState()
+     val onOpened by sharedViewModel.openedMovies.collectAsState()
+
+     val scrollState = rememberScrollState()
+
+    val movie = Data2(
+        kinopoiskId = film.kinopoiskId,
+        title = film.nameRu ?: "Unknown Title",
+        image = film.posterUrl ?: "default_image_url",
+        genres = film.genres?.map { it.genre } ?: emptyList(),
+        countries = film.countries?.map { it.country } ?: emptyList()
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-    ) {
+    ){
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(320.dp),
+                .height(480.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
             AsyncImage(
@@ -146,13 +219,35 @@ fun FilmDetails(
                 modifier = Modifier
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            ){
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Top,
+                    modifier = Modifier
+                        .padding(top =  0.dp,  start = 0.dp)
+                ){
+                    IconButton(
+                        onClick = {
+                            onOpenedClicked(movie)
+                            navController.navigate(NavigationItem.Home.route) {
+                            }
+                        }
+                    ){
+                        Icon(
+                                painter = painterResource(
+                                    id = if (onOpened.contains(movie)) R.drawable.caret_left else R.drawable.caret_left),
+                            contentDescription = "Back",
+                            tint = Color.White,
+                            modifier = Modifier
+                                .size(70.dp)
+                        )
+                    }
+                }
                 Text(
                     text = film.nameRu ?: "Нет названия",
                     style = MaterialTheme.typography.h5,
                     color = Color.White,
-                    textAlign = TextAlign.Center
-                )
+                    textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = buildString {
@@ -176,18 +271,50 @@ fun FilmDetails(
                         .fillMaxWidth()
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    IconButton(onClick = { /* Like */ }) {
-                        Icon(Icons.Default.Favorite, contentDescription = "Like", tint = Color.Gray)
+                ){
+                    IconButton(
+                        onClick = { onLikeClicked(movie) }
+                    ){
+                        Icon(
+                            painter = painterResource(
+                                id = if (isLiked.contains(movie)) R.drawable.heart_favorite_save___negative else R.drawable.heart_favorite_save
+                            ),
+                            contentDescription = "Like",
+                            tint = if (isLiked.contains(movie)) Color.Red else Color.White,
+                            modifier = Modifier.size(50.dp)
+                        )
                     }
-                    IconButton(onClick = { /* Bookmark */ }) {
-                        Icon(Icons.Default.Add, contentDescription = "Bookmark", tint = Color.Gray)
+                    IconButton(
+                        onClick = { onSaveClicked(movie) }
+                    ){
+                        Icon(
+                            painter = painterResource(
+                                id = if (isSaved.contains(movie)) R.drawable.favorite_flag_saved___neg else R.drawable.favorite_flag_saved
+                            ),
+                            contentDescription = "Save",
+                            tint = if (isSaved.contains(movie)) Color.Yellow else Color.White,
+                            modifier = Modifier.size(50.dp)
+                        )
                     }
-                    IconButton(onClick = { /* Share */ }) {
-                        Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.Gray)
+                    IconButton(
+                        onClick = { onWatchClicked(movie) }
+                    ){
+                        Icon(
+                            painter = painterResource(
+                                id = if (isWatched.contains(movie)) R.drawable.visible_eye_open else R.drawable.invisible_eye_closed
+                            ),
+                            contentDescription = "Watched",
+                            tint = if (isWatched.contains(movie)) Color.Green else Color.White,
+                            modifier = Modifier.size(50.dp)
+                        )
                     }
-                    IconButton(onClick = { /* More */ }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "More", tint = Color.Gray)
+                    IconButton(onClick = { }) {
+                        Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.White,
+                        )
+                    }
+                    IconButton(onClick = { }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More", tint = Color.White,
+                        )
                     }
                 }
             }
@@ -219,7 +346,7 @@ fun FilmDetails(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 30.dp, vertical = 5.dp)
-            ) {
+            ){
                 Text(
                     text = "Галерея",
                     style = MaterialTheme.typography.h6,
@@ -244,7 +371,6 @@ fun FilmDetails(
     }
 }
 
-
 @Composable
 fun ActorLazyGrid(actors: List<StaffResponse>, navController: NavController) {
     val rows = actors.chunked(4)
@@ -253,7 +379,7 @@ fun ActorLazyGrid(actors: List<StaffResponse>, navController: NavController) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
-        ) {
+        ){
             Text(
                 text = "В фильме снимались",
                 style = MaterialTheme.typography.h6,
@@ -268,12 +394,12 @@ fun ActorLazyGrid(actors: List<StaffResponse>, navController: NavController) {
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxWidth()
-        ) {
+        ){
             items(rows) { row ->
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.fillMaxHeight()
-                ) {
+                ){
                     row.forEach { actor ->
                         Row(
                             modifier = Modifier
@@ -281,7 +407,7 @@ fun ActorLazyGrid(actors: List<StaffResponse>, navController: NavController) {
                                 .clickable {
                                     navController.navigate("actorDetails/${actor.staffId}")
                                 }
-                        ) {
+                        ){
                             AsyncImage(
                                 model = actor.posterUrl,
                                 contentDescription = "Нет имени",
@@ -319,7 +445,7 @@ fun StaffLazyGrid(staff: List<StaffResponse>) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
-        ) {
+        ){
             Text(
                 text = "Над фильмом работали",
                 style = MaterialTheme.typography.h6,
@@ -334,12 +460,12 @@ fun StaffLazyGrid(staff: List<StaffResponse>) {
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxWidth()
-        ) {
+        ){
             items(rows) { row ->
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.fillMaxHeight()
-                ) {
+                ){
                     row.forEach { staffMember ->
                         Row(modifier = Modifier.padding(4.dp)) {
                             AsyncImage(
@@ -373,13 +499,13 @@ fun StaffLazyGrid(staff: List<StaffResponse>) {
 fun ImageGallery(images: List<ImageResponse>) {
     if (images.isEmpty()) {
         Text(text = "Галерея пуста", modifier = Modifier.padding(8.dp))
-    } else {
+    }else {
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
-        ) {
+        ){
             items(images) { image ->
                 AsyncImage(
                     model = image.imageUrl,
@@ -403,7 +529,7 @@ fun SimilarFilmsRow(similarFilms: List<SimilarFilmsResponse>, navController: Nav
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.width(120.dp)
-                    ) {
+                    ){
                         AsyncImage(
                             model = film.posterUrl,
                             contentDescription = film.nameRu ?: "",
