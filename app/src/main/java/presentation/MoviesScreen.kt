@@ -1,3 +1,5 @@
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -5,10 +7,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.kinopoisk.data.Data2
 import com.example.kinopoisk.data.KinoPoiskApi
-import com.example.kinopoisk.ui.theme.Data2
-import java.lang.reflect.Modifier
+import domain.ScreenState
+import presentation.MoviesGrid
 
 @Composable
 fun MoviesScreen(apiService: KinoPoiskApi, category: String) {
@@ -30,6 +35,7 @@ fun MoviesScreen(apiService: KinoPoiskApi, category: String) {
             if (response?.isSuccessful == true) {
                 val movieList = response.body()?.items?.map {
                     Data2(
+                        kinopoiskId = it.kinopoiskId ?: 0,
                         title = it.nameRu ?: "Unknown",
                         image = it.posterUrl ?: "",
                         genres = it.genres?.map { genre -> genre.genre } ?: emptyList(),
@@ -48,29 +54,23 @@ fun MoviesScreen(apiService: KinoPoiskApi, category: String) {
         }
     }
 
-
     when (screenState) {
         is ScreenState.Initial -> {
             Text("Welcome! Tap to load movies.", modifier = Modifier.padding(16.dp))
         }
-
         is ScreenState.Loading -> {
-            Text("Loading...", modifier = Modifier.padding(16.dp))
+            CircularProgressIndicator()
         }
-
         is ScreenState.Success -> {
             MoviesGrid(movies = movies.value)
         }
-
         is ScreenState.Error -> {
             Text(
                 text = (screenState as ScreenState.Error).message,
-                color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(16.dp)
             )
         }
-
-
         else -> {}
     }
 }
+

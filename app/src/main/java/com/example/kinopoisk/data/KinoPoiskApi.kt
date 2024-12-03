@@ -14,7 +14,7 @@ interface KinoPoiskApi {
         @Query("order") order: String = "NUM_VOTE",
         @Query("type") type: String = "FILM",
         @Query("ratingFrom") ratingFrom: Int = 8,
-        @Query("ratingTo") ratingTo: Int = 10,
+        @Query("ratingTo") ratingTo: Int = 1,
         @Query("yearFrom") yearFrom: Int = 1900,
         @Query("yearTo") yearTo: Int = 2100,
         @Query("page") page: Int = 1,
@@ -56,6 +56,8 @@ interface KinoPoiskApi {
         @Path("id") id: Int,
         @Header("X-API-KEY") apiKey: String = "3cbd176e-b918-4b06-bad3-2bca1ae24f75"
     ): Response<FilmImagesResponse>
+
+
 }
 
 val retrofit = Retrofit.Builder()
