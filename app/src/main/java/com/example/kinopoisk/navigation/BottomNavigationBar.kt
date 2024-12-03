@@ -37,6 +37,7 @@ import presentation.ActorPagee
 import presentation.FilmScreen
 import presentation.GalleryDetailScreen
 import presentation.MainPage
+import presentation.SearchScreen
 
 
 @Composable
@@ -74,7 +75,7 @@ fun SetupNavigation(navController: NavHostController) {
             MainPage(navController,viewM)
         }
         composable(NavigationItem.Search.route) {
-            SearchScreen()
+            SearchScreen(apiService,navController)
         }
         composable(NavigationItem.Profile.route) {
             ProfileScreen()
@@ -105,7 +106,7 @@ fun SetupNavigation(navController: NavHostController) {
         composable(route = "gallery/{filmId}", arguments = listOf(navArgument("filmId") { type = NavType.IntType })) { backStackEntry ->
             val filmId = backStackEntry.arguments?.getInt("filmId")
             if (filmId != null) {
-                GalleryDetailScreen(filmId = filmId)
+                GalleryDetailScreen(filmId = filmId,navController=navController)
             }
         }
         composable(
@@ -116,20 +117,16 @@ fun SetupNavigation(navController: NavHostController) {
             ActorFilmographyPage(actorId = actorId, viewModel = viewModel, navController = navController
             )
         }
+        composable("filterscreen") {
+            FilterScreen(navController) { selectedFilters ->
+                filters.value = selectedFilters
+            }
+        }
 
 
     }
 }
 
-@Composable
-fun SearchScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "Search Screen")
-    }
-}
 
 @Composable
 fun ProfileScreen() {

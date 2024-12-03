@@ -18,44 +18,50 @@ interface KinoPoiskApi {
         @Query("yearFrom") yearFrom: Int = 1900,
         @Query("yearTo") yearTo: Int = 2100,
         @Query("page") page: Int = 1,
-        @Header("X-API-KEY") apiKey: String = "310642af-0077-49b4-b6e3-a21974d8f028"
+        @Header("X-API-KEY") apiKey: String = "5244845c-3dfc-444b-ae3f-80a8d8dca96d"
     ): Response<MovieResponse>
 
     @GET("api/v2.2/films/{id}")
     suspend fun getFilmById(
         @Path("id") id: Int,
-        @Header("X-API-KEY") apiKey: String = "3cbd176e-b918-4b06-bad3-2bca1ae24f75"
+        @Header("X-API-KEY") apiKey: String = "5244845c-3dfc-444b-ae3f-80a8d8dca96d"
     ): Response<FilmResponse>
 
     @GET("api/v1/staff")
     suspend fun getActorsByFilmId(
         @Query("filmId") filmId: Int,
-        @Header("X-API-KEY") apiKey: String = "3cbd176e-b918-4b06-bad3-2bca1ae24f75"
+        @Header("X-API-KEY") apiKey: String = "5244845c-3dfc-444b-ae3f-80a8d8dca96d"
     ): Response<List<StaffResponse>>
 
     @GET("api/v1/staff")
     suspend fun getStaffByFilmId(
         @Query("filmId") filmId: Int,
-        @Header("X-API-KEY") apiKey: String = "3cbd176e-b918-4b06-bad3-2bca1ae24f75"
+        @Header("X-API-KEY") apiKey: String = "5244845c-3dfc-444b-ae3f-80a8d8dca96d"
     ): Response<List<StaffResponse>>
 
     @GET("api/v2.2/films/{id}/similars")
     suspend fun getSimilarByFilmId(
         @Path("id") id:Int,
-        @Header("X-API-KEY") apiKey: String = "3cbd176e-b918-4b06-bad3-2bca1ae24f75"
+        @Header("X-API-KEY") apiKey: String = "5244845c-3dfc-444b-ae3f-80a8d8dca96d"
     ):Response<SimilarResponse>
 
     @GET("api/v1/staff/{id}")
     suspend fun getActorDetailById(
         @Path("id") id: Int,
-        @Header("X-API-KEY") apiKey: String = "310642af-0077-49b4-b6e3-a21974d8f028"
+        @Header("X-API-KEY") apiKey: String = "5244845c-3dfc-444b-ae3f-80a8d8dca96d"
     ): Response<ActorResponse>
 
     @GET("api/v2.2/films/{id}/images")
     suspend fun getFilmImages(
         @Path("id") id: Int,
-        @Header("X-API-KEY") apiKey: String = "3cbd176e-b918-4b06-bad3-2bca1ae24f75"
+        @Header("X-API-KEY") apiKey: String = "5244845c-3dfc-444b-ae3f-80a8d8dca96d"
     ): Response<FilmImagesResponse>
+
+    @GET("api/v2.1/films/search-by-keyword")
+    suspend fun  searchFilms(
+        @Query("keyword") query: String,
+        @Header("X-API-KEY") apiKey: String = "5244845c-3dfc-444b-ae3f-80a8d8dca96d"
+    ): Response<MovieSearchResponse>
 }
 
 val retrofit = Retrofit.Builder()
