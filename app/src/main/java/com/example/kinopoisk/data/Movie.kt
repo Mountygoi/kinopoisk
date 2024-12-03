@@ -7,3 +7,7 @@ data class Movie(
     val genres: List<Genre>?  = null,
     val countries: List<Country>? = null
 )
+
+data class MovieSearchResponse(
+    val films: List<Movie>
+)

@@ -5,7 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.kinopoisk.presentation.welcome.WelcomePage
-import com.example.kinopoisk.ui.theme.MainScreen
+//import presentation.MainScreen
 
 @Composable
 fun NavigationToHomePage() {
@@ -17,9 +17,6 @@ val navigation = rememberNavController()
         composable("home"){
               MainScreen()
         }
-
-
-
     })
     
 }

@@ -23,6 +23,7 @@ class ActorFilmographyViewModel(private val apiService: KinoPoiskApi) : ViewMode
             is ActorFilmographyAction.SetFilmDetails -> _state.value = _state.value.copy(filmDetails = action.filmDetails, isLoading = false)
             is ActorFilmographyAction.SetError -> _state.value = _state.value.copy(errorMessage = action.errorMessage, isLoading = false)
             ActorFilmographyAction.SetLoading -> _state.value = _state.value.copy(isLoading = true)
+            else -> {}
         }
     }
     private fun loadFilmography(actorId: Int) {

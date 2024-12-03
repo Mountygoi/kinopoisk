@@ -4,6 +4,7 @@ package domain
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.kinopoisk.data.Data2
 import com.example.kinopoisk.data.KinoPoiskApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,11 +13,37 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+   class SharedViewModel : ViewModel() {
+    private val _watchedMovies = MutableStateFlow<List<Data2>>(emptyList())
+    val watchedMovies: StateFlow<List<Data2>> = _watchedMovies
 
+    private val _likedMovies = MutableStateFlow<List<Data2>>(emptyList())
+    val likedMovies: StateFlow<List<Data2>> = _likedMovies
+
+    private val _savedMovies = MutableStateFlow<List<Data2>>(emptyList())
+    val savedMovies: StateFlow<List<Data2>> = _savedMovies
+
+    private val _openedMovies = MutableStateFlow<List<Data2>>(emptyList())
+    val openedMovies: StateFlow<List<Data2>> = _openedMovies
+
+    fun setWatchedMovies(movies: List<Data2>) {
+        _watchedMovies.value = movies
+    }
+
+    fun setLikedMovies(movies: List<Data2>) {
+        _likedMovies.value = movies
+    }
+
+    fun setSavedMovies(movies: List<Data2>) {
+        _savedMovies.value = movies
+    }
+    fun setOpenedMovies(movies: List<Data2>){
+        _openedMovies.value = movies
+    }
+}
 
 class FilmDetailsViewModel(
-    private val apiService: KinoPoiskApi
-) : ViewModel() {
+    private val apiService: KinoPoiskApi): ViewModel() {
     private val _state = MutableStateFlow<FilmDetailsState>(FilmDetailsState.Loading)
     val state: StateFlow<FilmDetailsState> = _state.asStateFlow()
 
@@ -24,12 +51,11 @@ class FilmDetailsViewModel(
         when (intent) {
             is FilmDetailsIntent.LoadMovieDetails -> loadMovieDetails(intent.filmId)
             FilmDetailsIntent.Retry -> retryLoading()
+            else -> {}
         }
     }
-
     private fun loadMovieDetails(filmId: Int) {
         _state.value = FilmDetailsState.Loading
-
         viewModelScope.launch {
             try {
                 val filmResponse = withContext(Dispatchers.IO) {
@@ -70,13 +96,9 @@ class FilmDetailsViewModel(
             }
         }
     }
-
     private fun retryLoading() {
     }
 }
-
-
-
 class FilmDetailsViewModelFactory(
     private val apiService: KinoPoiskApi
 ) : ViewModelProvider.Factory {

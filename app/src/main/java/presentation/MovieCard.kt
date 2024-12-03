@@ -1,6 +1,8 @@
 package presentation
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,13 +33,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import coil.compose.rememberImagePainter
 import com.example.kinopoisk.data.Data2
 import domain.MoviesViewM
 
+
 @Composable
-fun MovieCard(item: Data2, navController: NavHostController) {
+fun MovieCard(item: Data2, navController: NavController) {
     Column(
         modifier = Modifier.padding(vertical = 10.dp, horizontal = 8.dp)
             .width(140.dp),
@@ -47,7 +53,12 @@ fun MovieCard(item: Data2, navController: NavHostController) {
             contentDescription = item.title,
             modifier = Modifier.size(150.dp)
                 .clickable {
-                    navController.navigate("movieDetails/${item.title}")
+                    if (item.kinopoiskId != 0) {
+                        navController.navigate("movieDetails/${item.kinopoiskId}")
+                    } else {
+                        Log.e("NavigationError", "Invalid kinopoiskId for movie: ${item.title}")
+                    }
+
                 }
         )
         Spacer(modifier = Modifier.height(5.dp))
@@ -66,6 +77,8 @@ fun MovieCard(item: Data2, navController: NavHostController) {
         )
     }
 }
+
+
 @Composable
 fun MovieDetailsScreen(filmTitle: String?,item: Data2) {
     Column(
@@ -149,7 +162,7 @@ fun MyLazyRow(title: String, movies: List<Data2>, navController:NavHostControlle
                         fontWeight = FontWeight.Normal,
                         color = Color.Black,
                         modifier = Modifier.clickable {
-                            navController.navigate("details$category")
+                            navController.navigate("details/$category")
                         }
                     )
                 }
