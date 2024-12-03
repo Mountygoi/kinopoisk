@@ -11,6 +11,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,9 +35,15 @@ import domain.FilmDetailsViewModelFactory
 import domain.MoviesViewM
 import presentation.ActorFilmographyPage
 import presentation.ActorPagee
+import presentation.CountryListScreen
 import presentation.FilmScreen
+import presentation.FilterParams
+import presentation.FilterScreen
+import presentation.FilteredMoviesScreen
 import presentation.GalleryDetailScreen
+import presentation.GenreListScreen
 import presentation.MainPage
+import presentation.YearRangePickerScreen
 
 
 @Composable
@@ -69,6 +76,7 @@ fun BottomNavigationBar(navController: NavController) {
 @Composable
 fun SetupNavigation(navController: NavHostController) {
     val viewM = remember { MoviesViewM(apiService) }
+    val filters = remember { mutableStateOf<FilterParams?>(null) }
     NavHost(navController, startDestination = NavigationItem.Home.route) {
         composable(NavigationItem.Home.route) {
             MainPage(navController,viewM)
@@ -105,7 +113,7 @@ fun SetupNavigation(navController: NavHostController) {
         composable(route = "gallery/{filmId}", arguments = listOf(navArgument("filmId") { type = NavType.IntType })) { backStackEntry ->
             val filmId = backStackEntry.arguments?.getInt("filmId")
             if (filmId != null) {
-                GalleryDetailScreen(filmId = filmId)
+                GalleryDetailScreen(filmId = filmId, navController = navController)
             }
         }
         composable(
@@ -114,6 +122,32 @@ fun SetupNavigation(navController: NavHostController) {
             val viewModelFactory = ActorFilmographyViewModelFactory(apiService)
             val viewModel: ActorFilmographyViewModel = viewModel(factory = viewModelFactory)
             ActorFilmographyPage(actorId = actorId, viewModel = viewModel, navController = navController
+            )
+        }
+        composable("filterscreen") {
+            FilterScreen(navController) { selectedFilters ->
+                filters.value = selectedFilters
+            }
+        }
+        composable("filtered_movies_screen") {
+            filters.value?.let {
+                FilteredMoviesScreen(apiService, it)
+            }
+        }
+        composable("countryListScreen") {
+            CountryListScreen(navController, apiService)
+        }
+        composable("genreListScreen") {
+            GenreListScreen(navController, apiService)
+        }
+        composable("yearListScreen") {
+            YearRangePickerScreen(
+                onRangeSelected = { startYear, endYear ->
+                    // Передача данных обратно в фильтрацию
+                    navController.previousBackStackEntry?.savedStateHandle?.set("startYear", startYear)
+                    navController.previousBackStackEntry?.savedStateHandle?.set("endYear", endYear)
+                    navController.popBackStack() // Возврат назад
+                }
             )
         }
 
