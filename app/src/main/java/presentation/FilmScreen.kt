@@ -194,18 +194,44 @@ fun FilmDetails(
             .fillMaxSize()
             .verticalScroll(scrollState)
     ){
+        Column(
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier
+                .padding(top =  4.dp,  start = 20.dp)
+        ){
+            IconButton(
+                onClick = {
+                    onOpenedClicked(movie)
+                    navController.navigate(NavigationItem.Home.route) {
+                    }
+                }
+            ){
+                Icon(
+                    painter = painterResource(
+                        id = if (onOpened.contains(movie)) R.drawable.caret_left else R.drawable.caret_left),
+                    contentDescription = "Back",
+                    tint = Color.Black,
+                    modifier = Modifier
+                        .size(24.dp)
+                )
+            }
+        }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(480.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
+
+
             AsyncImage(
                 model = film.posterUrl?.takeIf { it.isNotEmpty() } ?: "default_image_url",
                 contentDescription = "Film Poster",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -215,34 +241,13 @@ fun FilmDetails(
                         )
                     )
             )
+
             Column(
                 modifier = Modifier
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
-                Column(
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.Top,
-                    modifier = Modifier
-                        .padding(top =  0.dp,  start = 0.dp)
-                ){
-                    IconButton(
-                        onClick = {
-                            onOpenedClicked(movie)
-                            navController.navigate(NavigationItem.Home.route) {
-                            }
-                        }
-                    ){
-                        Icon(
-                                painter = painterResource(
-                                    id = if (onOpened.contains(movie)) R.drawable.caret_left else R.drawable.caret_left),
-                            contentDescription = "Back",
-                            tint = Color.White,
-                            modifier = Modifier
-                                .size(70.dp)
-                        )
-                    }
-                }
+
                 Text(
                     text = film.nameRu ?: "Нет названия",
                     style = MaterialTheme.typography.h5,

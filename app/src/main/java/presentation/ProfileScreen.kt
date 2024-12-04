@@ -1,6 +1,7 @@
 package presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
@@ -35,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.kinopoisk.R
 import com.example.kinopoisk.data.Data2
@@ -48,36 +51,57 @@ import domain.SharedViewModel
 ) {
         val watchedMovies = viewModel.watchedMovies.collectAsState().value
         val openedMovies = viewModel.openedMovies.collectAsState().value
+    val likedMovies = viewModel.likedMovies.collectAsState().value
+    val savedMovies = viewModel.savedMovies.collectAsState().value
+
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-    ){
+    ) {
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-            ){
-                Text(text = "Просмотрено", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            ) {
+                Text(
+                    text = "Просмотрено",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium
+                )
                 Text(
                     text = "${watchedMovies.size} >",
+                    fontSize = 18.sp,
                     style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.primary),
                     modifier = Modifier.clickable {
-                            navController.navigate("watchedMovies")
-                        }
-                 )
+                        navController.navigate("watchedMovies")
+                    }
+                )
+                IconButton(
+                    onClick = { viewModel.setWatchedMovies(emptyList()) }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.icons),
+                        contentDescription = null,
+                        tint = Color.Blue,
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
             }
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
                 items(watchedMovies) { movie ->
-                        MovieCard(item = movie, navController = navController)
+                    MovieCard(item = movie, navController = navController)
                 }
             }
         }
+
+
+
         item {
             Spacer(modifier = Modifier.height(20.dp))
         }
@@ -87,7 +111,7 @@ import domain.SharedViewModel
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Text(text = "Коллекции", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                Text(text = "Коллекции", fontSize = 20.sp, fontWeight = FontWeight.Medium)
             }
         }
                 item {
@@ -96,14 +120,13 @@ import domain.SharedViewModel
         item {
               Text(text = "+  Создать свою коллекцию",
                   fontSize = 16.sp,
-                  fontWeight = FontWeight.Medium,
-                  color = Color.Blue,
+                  fontWeight = FontWeight.Normal,
+                  color = Color.Gray,
                   modifier = Modifier.clickable { navController.navigate("createCollection") }
-                      .padding(20.dp)
                   )
         }
                 item {
-                       Spacer(modifier = Modifier.height(20.dp))
+                       Spacer(modifier = Modifier.height(10.dp))
             }
         item {
                 Row(
@@ -112,13 +135,15 @@ import domain.SharedViewModel
         ) {
             MovieCategoryBox(
                 icon = R.drawable.heart_favorite_save,
-                text = "Любимые"
+                text = "Любимые",
+                list = likedMovies
             ){
                 navController.navigate("likedMovies")
             }
             MovieCategoryBox(
                 icon = R.drawable.favorite_flag_saved,
-                text = "Хочу посмотреть"
+                text = "Хочу посмотреть",
+                list = savedMovies
             ){
                 navController.navigate("savedMovies")
             }
@@ -130,15 +155,27 @@ import domain.SharedViewModel
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Вам было интересно", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            Text(text = "Вам было интересно", fontSize = 20.sp, fontWeight = FontWeight.Medium)
             Text(
                 text = "${openedMovies.size} >",
+                fontSize = 18.sp,
                 style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.primary),
                 modifier = Modifier
                     .clickable {
                 navController.navigate("openedMovies")
                  }
+
             )
+                IconButton(
+                    onClick = { viewModel.setOpenedMovies(emptyList()) }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.icons),
+                        contentDescription = null,
+                        tint = Color.Blue,
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
         }
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -156,20 +193,22 @@ import domain.SharedViewModel
     fun MovieCategoryBox(
         icon: Int,
         text: String,
+        list: List<Data2>,
         onClick: () -> Unit
     ){
     Box(
             modifier = Modifier
-            .height(150.dp)
-            .width(150.dp)
+            .height(170.dp)
+            .width(170.dp)
             .clickable { onClick() }
             .padding(14.dp)
-            .background(Color.LightGray, shape = RoundedCornerShape(8.dp)),
+            .background(Color.White, shape = RoundedCornerShape(8.dp))
+                .border(color = Color.Black, width = 2.dp, shape = RoundedCornerShape(8.dp)),
              contentAlignment = Alignment.Center
     ){
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ){
             Icon(
                 painter = painterResource(id = icon),
@@ -183,6 +222,15 @@ import domain.SharedViewModel
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
+
+
+                Text(
+                    text = "${list.size} ",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.h4.copy(color = Color.Blue),
+                )
+
         }
     }
 }
